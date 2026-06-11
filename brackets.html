@@ -27,7 +27,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 <div class="ticker-wrap"><div class="ticker-track" id="tickerTrack">BRACKETS LOADING...</div></div>
 <a class="back-nav" href="index.html">&#8592; Back to Teams</a>
 <div class="hero"><div class="eyebrow">Tournament Central</div><h1 class="title">GAME<br><span>BRACKETS</span></h1><p class="sub" id="subText">Pick winners. Crown chaos.</p></div>
-<div class="nav-row"><a href="index.html" class="nav-btn secondary">All Teams</a><button class="nav-btn primary" onclick="autoBuildAll()">Build Brackets</button></div>
+<div class="nav-row"><a href="index.html" class="nav-btn secondary">All Teams</a><a href="funzone.html" class="nav-btn secondary">Fun Zone</a><button class="nav-btn primary" onclick="autoBuildAll()">Build Brackets</button></div>
 <div class="section"><div class="notice">Add teams and games from <b>Event Settings</b> on the main page. This page saves each bracket in your browser using the same localStorage as your team pages.</div><div class="game-tabs" id="gameTabs"></div><div id="bracketArea"></div></div>
 <script>
 let state={eventName:'',subtitle:'',announcerName:'',announcer:'',games:[],teams:[],brackets:{}};
