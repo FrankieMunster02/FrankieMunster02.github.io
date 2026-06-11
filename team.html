@@ -94,16 +94,6 @@ body{background:var(--bg);color:var(--text);font-family:'Rubik',sans-serif;overf
 .add-member-btn{background:transparent;border:1.5px dashed rgba(255,255,255,.12);border-radius:14px;padding:.75rem 1rem;min-width:88px;color:var(--muted);cursor:pointer;font-family:'Rubik',sans-serif;font-size:12px;font-weight:700;transition:all .2s;text-transform:uppercase;letter-spacing:.5px}
 .add-member-btn:hover{border-color:var(--team-color);color:var(--team-color)}
 
-
-.member-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1rem;margin-top:.75rem}
-.member-card{min-width:0;align-items:stretch;text-align:left;padding:0;overflow:hidden;background:linear-gradient(180deg,var(--surface2),var(--surface));}
-.member-photo{height:150px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:54px;background-size:cover;background-position:center}
-.member-info{padding:.85rem}
-.member-name{font-size:15px;text-align:left}
-.member-title,.member-detail{font-size:11px;color:var(--muted);line-height:1.35;text-align:left;margin-top:.2rem}
-.member-detail b{color:var(--team-color)}
-.trading-card-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--team-color);font-weight:900;margin-bottom:.25rem}
-
 /* MODAL */
 .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px)}
 .modal-backdrop.hidden{display:none}
@@ -138,7 +128,7 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 
 <div class="ticker-wrap"><div class="ticker-track" id="ticker">Loading...</div></div>
 
-<a class="back-nav" href="index.html">&#8592; All Teams</a><a class="back-nav" href="funzone.html" style="float:right">Fun Zone &#8594;</a>
+<a class="back-nav" href="index.html">&#8592; All Teams</a>
 
 <div class="team-hero" id="teamHero">
   <div class="hero-glow" id="heroGlow"></div>
@@ -207,32 +197,8 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
         <input class="form-input" id="memberNameInput" placeholder="Player name" maxlength="24">
       </div>
       <div class="form-group">
-        <label class="form-label">Nickname</label>
-        <input class="form-input" id="memberNickInput" placeholder="e.g. The Closer" maxlength="28">
-      </div>
-      <div class="form-group">
         <label class="form-label">Role or Title</label>
         <input class="form-input" id="memberTitleInput" placeholder="e.g. Captain" maxlength="24">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Photo URL</label>
-        <input class="form-input" id="memberPhotoInput" placeholder="Paste an image URL, or leave blank for emoji">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Strength</label>
-        <input class="form-input" id="memberStrengthInput" placeholder="e.g. Beer Pong Sniper" maxlength="40">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Weakness</label>
-        <input class="form-input" id="memberWeaknessInput" placeholder="e.g. Dizzy Bat" maxlength="40">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Favorite Game</label>
-        <input class="form-input" id="memberFavInput" placeholder="e.g. Flip Cup" maxlength="40">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Fun Fact</label>
-        <input class="form-input" id="memberFactInput" placeholder="A ridiculous player fact" maxlength="80">
       </div>
       <div class="form-group">
         <label class="form-label">Avatar</label>
@@ -355,17 +321,7 @@ function renderRoster(){
   (teamData.members||[]).forEach(m=>{
     const div=document.createElement('div');
     div.className='member-card';
-    const photo=m.photo?`style="background-image:url('${safeAttr(m.photo)}')"`:'';
-    div.innerHTML=`<div class="member-photo" ${photo}>${m.photo?'':(m.emoji||'?')}</div>
-      <div class="member-info">
-        <div class="trading-card-label">Player Card</div>
-        <div class="member-name">${escapeHTML(m.name)} ${m.nick?`<span style="color:var(--team-color)">"${escapeHTML(m.nick)}"</span>`:''}</div>
-        <div class="member-title">${escapeHTML(m.title||'Competitor')}</div>
-        ${m.strength?`<div class="member-detail"><b>Power:</b> ${escapeHTML(m.strength)}</div>`:''}
-        ${m.weakness?`<div class="member-detail"><b>Weakness:</b> ${escapeHTML(m.weakness)}</div>`:''}
-        ${m.favorite?`<div class="member-detail"><b>Favorite:</b> ${escapeHTML(m.favorite)}</div>`:''}
-        ${m.fact?`<div class="member-detail"><b>Fact:</b> ${escapeHTML(m.fact)}</div>`:''}
-      </div>`;
+    div.innerHTML=`<div class="member-avatar">${m.emoji||'?'}</div><div class="member-name">${m.name}</div><div class="member-title">${m.title||''}</div>`;
     div.onclick=()=>openMemberModal(m.id);
     grid.appendChild(div);
   });
@@ -376,13 +332,7 @@ function openMemberModal(id){
   const m=id?teamData.members.find(m=>m.id===id):null;
   document.getElementById('memberModalTitle').textContent=m?'Edit Player':'Add Player';
   document.getElementById('memberNameInput').value=m?.name||'';
-  document.getElementById('memberNickInput').value=m?.nick||'';
   document.getElementById('memberTitleInput').value=m?.title||'';
-  document.getElementById('memberPhotoInput').value=m?.photo||'';
-  document.getElementById('memberStrengthInput').value=m?.strength||'';
-  document.getElementById('memberWeaknessInput').value=m?.weakness||'';
-  document.getElementById('memberFavInput').value=m?.favorite||'';
-  document.getElementById('memberFactInput').value=m?.fact||'';
   document.getElementById('deleteMemberBtn').style.display=m?'block':'none';
   selectedMemberEmoji=m?.emoji||MEMBER_EMOJIS[0];
   buildMemberEmojiPicker();
@@ -396,27 +346,14 @@ function pickMemberEmoji(e){selectedMemberEmoji=e;buildMemberEmojiPicker()}
 function saveMember(){
   const name=document.getElementById('memberNameInput').value.trim();
   if(!name){alert('Give the player a name!');return}
-  const payload={
-    name,
-    nick:document.getElementById('memberNickInput').value.trim(),
-    title:document.getElementById('memberTitleInput').value.trim(),
-    photo:document.getElementById('memberPhotoInput').value.trim(),
-    strength:document.getElementById('memberStrengthInput').value.trim(),
-    weakness:document.getElementById('memberWeaknessInput').value.trim(),
-    favorite:document.getElementById('memberFavInput').value.trim(),
-    fact:document.getElementById('memberFactInput').value.trim(),
-    emoji:selectedMemberEmoji
-  };
   if(editingMemberId){
     const m=teamData.members.find(m=>m.id===editingMemberId);
-    Object.assign(m,payload);
+    m.name=name;m.title=document.getElementById('memberTitleInput').value.trim();m.emoji=selectedMemberEmoji;
   }else{
-    teamData.members.push({id:'m'+Date.now(),...payload});
+    teamData.members.push({id:'m'+Date.now(),name,title:document.getElementById('memberTitleInput').value.trim(),emoji:selectedMemberEmoji});
   }
   save();render();closeMemberModal();burst();
 }
-function escapeHTML(str){return String(str||'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
-function safeAttr(str){return String(str||'').replace(/["'<>]/g,'')}
 function deleteMember(){
   teamData.members=teamData.members.filter(m=>m.id!==editingMemberId);
   save();render();closeMemberModal();
@@ -454,6 +391,9 @@ document.getElementById('memberModal').addEventListener('click',e=>{if(e.target=
 buildStars();
 load();
 </script>
+
+<!-- Photo upload support patch placeholder added by ChatGPT -->
 </body>
 </html>
 Done
+
