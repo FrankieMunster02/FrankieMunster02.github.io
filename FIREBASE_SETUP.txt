@@ -1,0 +1,27 @@
+Firebase setup needed after uploading these files to GitHub Pages:
+
+1. In Firebase Console, open project: poconos-beer-olympics.
+2. Go to Build > Firestore Database.
+3. Create the database if you have not already.
+4. For testing, use these Firestore rules:
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /beerOlympics/{docId} {
+      allow read, write: if true;
+    }
+  }
+}
+
+Important: those rules let anyone who visits the site edit the data. That is okay only for testing/private sharing. Later, add Firebase Authentication if you want only invited people to edit.
+
+The shared website data is stored at:
+beerOlympics/mainState
+
+Files changed/added:
+- firebase-sync.js added
+- index.html updated
+- team.html updated
+- funzone.html updated
+- brackets.html updated

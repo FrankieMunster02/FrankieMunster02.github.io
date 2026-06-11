@@ -309,6 +309,10 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-analytics-compat.js"></script>
+<script src="firebase-sync.js"></script>
 <script>
 const COLORS = ['#ff3c6e','#ff8c42','#ffd84d','#39ff9a','#00d4ff','#4d8fff','#c042ff','#ff42c8','#ffffff'];
 const EMOJIS = ['&#x1F3C6;','&#x26A1;','&#x1F525;','&#x1F480;','&#x1F409;','&#x1F98A;','&#x1F985;','&#x1F99C;','&#x1F30A;','&#x1F300;','&#x1F47E;','&#x1F916;','&#x2694;','&#x1F94A;','&#x1F3AF;','&#x1F52E;','&#x1F31F;','&#x1FAB6;','&#x1F9A2;','&#x1F31A;'];
@@ -327,12 +331,16 @@ let selectedColor = COLORS[0];
 let selectedEmoji = EMOJIS[0];
 
 function load(){
-  const saved = localStorage.getItem('beerOlympicsState');
-  if(saved) try{ state = JSON.parse(saved); }catch(e){}
-  render();
+  loadBeerOlympicsState((newState)=>{
+    state = newState;
+    render();
+  });
 }
 function save(){
-  localStorage.setItem('beerOlympicsState', JSON.stringify(state));
+  saveBeerOlympicsState(state).catch(err=>{
+    console.error('Save failed:', err);
+    alert('Could not save online. Check your Firebase Firestore rules.');
+  });
 }
 
 function render(){

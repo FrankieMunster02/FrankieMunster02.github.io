@@ -245,6 +245,10 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-analytics-compat.js"></script>
+<script src="firebase-sync.js"></script>
 <script>
 const MEMBER_EMOJIS = ['&#x1F60E;','&#x1F920;','&#x1F610;','&#x1F9D0;','&#x1F92A;','&#x1F608;','&#x1F47F;','&#x1F916;','&#x1F9D9;','&#x1F977;','&#x1F9B8;','&#x1F47E;','&#x1F9A7;','&#x1F98D;','&#x1F432;','&#x1F3AD;','&#x1F451;','&#x1FA96;','&#x1F9A1;','&#x1F985;'];
 
@@ -265,20 +269,26 @@ let selectedMemberEmoji=MEMBER_EMOJIS[0];
 function load(){
   const params=new URLSearchParams(window.location.search);
   teamId=params.get('id');
-  const saved=localStorage.getItem('beerOlympicsState');
-  if(saved)try{state=JSON.parse(saved)}catch(e){}
-  if(!state.teams)state.teams=[];
-  teamData=state.teams.find(t=>t.id===teamId);
-  if(!teamData){
-    document.body.innerHTML='<div style="padding:3rem;text-align:center;color:#5a5a80;font-family:Rubik,sans-serif">Team not found. <a href="index.html" style="color:#ffd84d">&#8592; Back</a></div>';
-    return;
-  }
-  if(!teamData.members)teamData.members=[];
-  if(!teamData.results)teamData.results={};
-  document.title=teamData.name+' — Beer Olympics';
-  render();
+  loadBeerOlympicsState((newState)=>{
+    state = newState;
+    if(!state.teams)state.teams=[];
+    teamData=state.teams.find(t=>t.id===teamId);
+    if(!teamData){
+      document.body.innerHTML='<div style="padding:3rem;text-align:center;color:#5a5a80;font-family:Rubik,sans-serif">Team not found. <a href="index.html" style="color:#ffd84d">&#8592; Back</a></div>';
+      return;
+    }
+    if(!teamData.members)teamData.members=[];
+    if(!teamData.results)teamData.results={};
+    document.title=teamData.name+' — Beer Olympics';
+    render();
+  });
 }
-function save(){localStorage.setItem('beerOlympicsState',JSON.stringify(state))}
+function save(){
+  saveBeerOlympicsState(state).catch(err=>{
+    console.error('Save failed:',err);
+    alert('Could not save online. Check your Firebase Firestore rules. Photos may also be too large.');
+  });
+}
 
 function render(){
   document.documentElement.style.setProperty('--team-color',teamData.color||'#ffd84d');

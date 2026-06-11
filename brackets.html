@@ -28,12 +28,16 @@ body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradi
 <a class="back-nav" href="index.html">&#8592; Back to Teams</a>
 <div class="hero"><div class="eyebrow">Tournament Central</div><h1 class="title">GAME<br><span>BRACKETS</span></h1><p class="sub" id="subText">Pick winners. Crown chaos.</p></div>
 <div class="nav-row"><a href="index.html" class="nav-btn secondary">All Teams</a><a href="funzone.html" class="nav-btn secondary">Fun Zone</a><button class="nav-btn primary" onclick="autoBuildAll()">Build Brackets</button></div>
-<div class="section"><div class="notice">Add teams and games from <b>Event Settings</b> on the main page. This page saves each bracket in your browser using the same localStorage as your team pages.</div><div class="game-tabs" id="gameTabs"></div><div id="bracketArea"></div></div>
+<div class="section"><div class="notice">Add teams and games from <b>Event Settings</b> on the main page. This page saves brackets online with Firebase, so changes show on other devices.</div><div class="game-tabs" id="gameTabs"></div><div id="bracketArea"></div></div>
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.14.0/firebase-analytics-compat.js"></script>
+<script src="firebase-sync.js"></script>
 <script>
 let state={eventName:'',subtitle:'',announcerName:'',announcer:'',games:[],teams:[],brackets:{}};
 let activeGame='';
-function load(){const saved=localStorage.getItem('beerOlympicsState');if(saved)try{state=JSON.parse(saved)}catch(e){};if(!state.games)state.games=[];if(!state.teams)state.teams=[];if(!state.brackets)state.brackets={};activeGame=state.games[0]||'';render();}
-function save(){localStorage.setItem('beerOlympicsState',JSON.stringify(state));}
+function load(){loadBeerOlympicsState((newState)=>{state=newState;if(!state.games)state.games=[];if(!state.teams)state.teams=[];if(!state.brackets)state.brackets={};if(!activeGame||!state.games.includes(activeGame))activeGame=state.games[0]||'';render();});}
+function save(){saveBeerOlympicsState(state).catch(err=>{console.error('Save failed:',err);alert('Could not save online. Check your Firebase Firestore rules.');});}
 function nextPowerOfTwo(n){let p=1;while(p<n)p*=2;return Math.max(p,2)}
 function makeBracket(game){const teams=[...state.teams].map((t,i)=>({id:t.id,name:t.name,seed:i+1,color:t.color,emoji:t.emoji}));const size=nextPowerOfTwo(teams.length||2);while(teams.length<size)teams.push(null);let rounds=[];let first=[];for(let i=0;i<size;i+=2)first.push({slots:[teams[i],teams[i+1]],winner:null});rounds.push(first);let matches=size/4;while(matches>=1){rounds.push(Array.from({length:matches},()=>({slots:[null,null],winner:null})));matches=Math.floor(matches/2)}state.brackets[game]={game,rounds,updated:Date.now()};save();}
 function autoBuildAll(){if(!state.games.length||!state.teams.length){alert('Add at least one game and two teams first.');return}state.games.forEach(g=>makeBracket(g));activeGame=state.games[0];render();burst();}
