@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beer Olympics</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,400;0,500;0,700;0,900;1,400&family=Rubik+Mono+One&family=Rubik+Dirt&family=Rubik+Wet+Paint&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04040e;
+  --surface:#0c0c1a;
+  --surface2:#131325;
+  --text:#e8e8ff;
+  --muted:#5a5a80;
+  --accent:#ff3c6e;
+  --neon-green:#39ff9a;
+  --neon-blue:#00d4ff;
+  --neon-yellow:#ffe033;
+  --neon-purple:#c042ff;
+  --neon-pink:#ff42c8;
+  --gold:#ffd84d;
+}
+body{background:var(--bg);color:var(--text);font-family:'Rubik',sans-serif;overflow-x:hidden;min-height:100vh}
+
+/* STARFIELD */
+#starfield{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle linear infinite}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.9}}
+
+/* TICKER */
+.ticker-wrap{position:relative;z-index:10;background:rgba(4,4,14,.9);border-bottom:1px solid rgba(255,216,77,.25);overflow:hidden;height:34px;display:flex;align-items:center;backdrop-filter:blur(8px)}
+.ticker-track{display:flex;animation:ticker 40s linear infinite;white-space:nowrap;gap:80px;font-size:12px;font-weight:600;color:var(--gold);letter-spacing:.8px;text-transform:uppercase}
+.ticker-track .sep{color:var(--muted);margin:0 12px}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* HERO */
+.hero{position:relative;z-index:1;text-align:center;padding:4rem 1rem 2.5rem;overflow:hidden}
+.hero-eyebrow{font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--neon-green);margin-bottom:1rem;font-weight:600}
+.hero-title{font-family:'Rubik Wet Paint',cursive;font-size:clamp(3.5rem,11vw,8rem);line-height:.95;color:var(--gold);filter:drop-shadow(0 0 30px rgba(255,216,77,.25));margin-bottom:.75rem}
+.hero-title .line2{color:var(--neon-green);filter:drop-shadow(0 0 20px rgba(57,255,154,.3))}
+.hero-sub{font-family:'Rubik Dirt',cursive;font-size:clamp(1rem,3vw,1.6rem);color:var(--accent);margin-bottom:2rem;min-height:1.8em}
+.hero-sub:empty::before{content:'Set a subtitle in Event Settings';color:var(--muted);font-style:italic}
+
+/* NEON GLOW RINGS */
+.rings{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.ring{position:absolute;border-radius:50%;border:1px solid;transform:translate(-50%,-50%);animation:ringPulse 4s ease-in-out infinite}
+@keyframes ringPulse{0%,100%{opacity:.04;transform:translate(-50%,-50%) scale(1)}50%{opacity:.12;transform:translate(-50%,-50%) scale(1.03)}}
+
+/* ANNOUNCER */
+.announcer-wrap{position:relative;z-index:1;max-width:680px;margin:0 auto 2.5rem}
+.announcer-bar{background:rgba(13,13,37,.8);border:1.5px solid var(--gold);border-radius:18px;padding:1rem 1.5rem;display:flex;align-items:flex-start;gap:1.25rem;backdrop-filter:blur(12px);box-shadow:0 0 40px rgba(255,216,77,.08)}
+.announcer-avatar-wrap{flex-shrink:0;animation:announcerBob 2.5s ease-in-out infinite}
+@keyframes announcerBob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-6px) rotate(2deg)}}
+.announcer-avatar{width:54px;height:54px;background:var(--surface2);border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:26px}
+.announcer-label{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:5px}
+.announcer-text{font-size:14px;color:var(--text);line-height:1.6;font-style:italic}
+.announcer-text:empty::before{content:'Set the announcer quote in Event Settings';color:var(--muted)}
+
+/* NAV BUTTONS */
+.nav-row{position:relative;z-index:1;display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:3.5rem}
+.nav-btn{font-family:'Rubik',sans-serif;font-weight:700;font-size:14px;padding:.65rem 1.5rem;border-radius:50px;border:none;cursor:pointer;text-decoration:none;transition:transform .15s,box-shadow .15s;display:inline-flex;align-items:center;gap:.5rem;letter-spacing:.3px}
+.nav-btn:hover{transform:translateY(-2px)}
+.nav-btn.primary{background:var(--accent);color:#fff;box-shadow:0 0 20px rgba(255,60,110,.3)}
+.nav-btn.primary:hover{box-shadow:0 0 32px rgba(255,60,110,.5)}
+.nav-btn.secondary{background:transparent;color:var(--gold);border:1.5px solid rgba(255,216,77,.5)}
+.nav-btn.secondary:hover{background:rgba(255,216,77,.07);border-color:var(--gold)}
+.nav-btn.teal{background:transparent;color:var(--neon-green);border:1.5px solid rgba(57,255,154,.4)}
+.nav-btn.teal:hover{background:rgba(57,255,154,.07);border-color:var(--neon-green)}
+
+/* SECTION */
+.section{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 1.5rem 3.5rem}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem}
+.section-title{font-family:'Rubik Mono One',monospace;font-size:clamp(1rem,2.5vw,1.4rem);color:var(--text);letter-spacing:-1px}
+.section-title .hl{color:var(--neon-blue)}
+.section-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,rgba(57,255,154,.2),transparent);margin-bottom:2.5rem;position:relative;z-index:1}
+
+/* TEAMS GRID */
+.teams-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.25rem}
+.team-card{background:var(--surface);border-radius:18px;overflow:hidden;cursor:pointer;text-decoration:none;color:inherit;transition:transform .2s,box-shadow .2s;border:1px solid rgba(255,255,255,.05);position:relative;display:block}
+.team-card:hover{transform:translateY(-5px)}
+.team-card-banner{height:110px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;font-size:64px}
+.team-card-banner::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(4,4,14,.7))}
+.team-card-body{padding:1rem 1.1rem 1.2rem}
+.team-card-name{font-family:'Rubik Dirt',cursive;font-size:1.15rem;margin-bottom:.35rem;color:var(--text);text-shadow:0 0 20px currentColor}
+.team-card-cry{font-size:12px;color:var(--muted);font-style:italic;margin-bottom:.6rem;line-height:1.4;min-height:1.4em}
+.hype-bar{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-top:.5rem}
+.hype-fill{height:100%;border-radius:2px;transition:width .6s ease}
+.team-wins{font-size:11px;color:var(--muted);margin-top:.5rem;letter-spacing:.5px}
+.team-wins b{color:var(--gold)}
+.card-edit-hint{font-size:10px;color:var(--gold);text-align:center;margin-top:.5rem;text-transform:uppercase;letter-spacing:1px}
+
+/* ADD TEAM */
+.add-team-card{background:var(--surface);border-radius:18px;border:1.5px dashed rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.6rem;cursor:pointer;min-height:210px;transition:all .2s;color:var(--muted)}
+.add-team-card:hover{border-color:var(--neon-green);color:var(--neon-green)}
+.add-team-card svg{width:28px;height:28px}
+.add-team-card span{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px}
+
+/* GAMES */
+.games-row{display:flex;flex-wrap:wrap;gap:.6rem;margin-bottom:1rem}
+.game-chip{background:var(--surface2);border:1px solid rgba(255,255,255,.07);border-radius:50px;padding:.35rem 1rem;font-size:13px;font-weight:500;color:var(--text)}
+.games-empty{font-size:13px;color:var(--muted);font-style:italic}
+
+/* EDIT BAR */
+.edit-bar{background:rgba(255,216,77,.05);border:1px solid rgba(255,216,77,.15);border-radius:12px;padding:.75rem 1.25rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem}
+.edit-bar p{font-size:13px;color:var(--gold)}
+.btn-edit-mode{font-family:'Rubik',sans-serif;font-weight:700;font-size:13px;padding:.4rem 1rem;border-radius:50px;border:none;cursor:pointer;background:var(--gold);color:#000}
+
+/* MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px)}
+.modal-backdrop.hidden{display:none}
+.modal{background:var(--surface);border-radius:22px;max-width:480px;width:100%;border:1px solid rgba(255,255,255,.08);max-height:90vh;overflow-y:auto}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.modal-header h2{font-family:'Rubik Mono One',monospace;font-size:1rem;color:var(--gold)}
+.modal-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:6px}
+.modal-close:hover{color:var(--text);background:rgba(255,255,255,.08)}
+.modal-body{padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem}
+.form-group{display:flex;flex-direction:column;gap:.4rem}
+.form-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700}
+.form-input{background:var(--bg);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:'Rubik',sans-serif;font-size:15px;outline:none;width:100%;transition:border-color .2s}
+.form-input:focus{border-color:var(--neon-green)}
+textarea.form-input{resize:vertical;min-height:80px}
+.color-row{display:flex;flex-wrap:wrap;gap:.6rem}
+.color-swatch{width:34px;height:34px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all .18s;flex-shrink:0}
+.color-swatch.active,.color-swatch:hover{border-color:#fff;transform:scale(1.18)}
+.emoji-picker{display:flex;flex-wrap:wrap;gap:.4rem}
+.emoji-opt{font-size:22px;cursor:pointer;padding:.3rem;border-radius:8px;transition:all .15s;border:2px solid transparent}
+.emoji-opt:hover,.emoji-opt.active{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);transform:scale(1.15)}
+.range-wrap{display:flex;align-items:center;gap:.75rem}
+.form-input[type=range]{padding:.2rem 0;cursor:pointer;accent-color:var(--neon-green)}
+.range-val{font-size:13px;color:var(--neon-green);font-weight:700;font-family:'Rubik Mono One',monospace;min-width:2.5rem}
+.btn-save{width:100%;background:linear-gradient(135deg,var(--accent),var(--neon-purple));color:#fff;border:none;border-radius:50px;padding:.85rem;font-family:'Rubik',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.btn-save:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(255,60,110,.35)}
+.btn-danger{width:100%;background:transparent;color:#ff5555;border:1px solid rgba(255,85,85,.4);border-radius:50px;padding:.7rem;font-family:'Rubik',sans-serif;font-weight:600;font-size:13px;cursor:pointer;margin-top:.15rem}
+.btn-danger:hover{background:rgba(255,85,85,.08)}
+
+/* CONFETTI */
+.confetti-piece{position:fixed;width:8px;height:8px;pointer-events:none;z-index:999;animation:confettiFall 2.5s ease-in forwards}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(-10px) rotate(0deg)}100%{opacity:0;transform:translateY(100vh) rotate(900deg)}}
+
+/* FOOTER */
+.footer{position:relative;z-index:1;text-align:center;padding:2rem;color:var(--muted);font-size:12px;border-top:1px solid rgba(255,255,255,.04);margin-top:1rem;letter-spacing:.5px}
+.footer a{color:var(--neon-green);text-decoration:none}
+
+/* SCANLINE OVERLAY */
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.03) 2px,rgba(0,0,0,.03) 4px);pointer-events:none;z-index:5}
+</style>
+</head>
+<body>
+
+<div id="starfield"></div>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track" id="tickerTrack">
+    <span>BEER OLYMPICS</span><span class="sep">—</span>
+    <span>BEER OLYMPICS</span><span class="sep">—</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="rings">
+    <div class="ring" style="width:600px;height:600px;border-color:rgba(57,255,154,.15);animation-delay:0s"></div>
+    <div class="ring" style="width:900px;height:900px;border-color:rgba(0,212,255,.08);animation-delay:1.5s"></div>
+    <div class="ring" style="width:1200px;height:1200px;border-color:rgba(255,60,110,.06);animation-delay:3s"></div>
+  </div>
+
+  <div class="hero-eyebrow" id="heroEyebrow">Official Event</div>
+  <h1 class="hero-title" id="heroTitle">
+    <span class="line1">BEER</span><br>
+    <span class="line2">OLYMPICS</span>
+  </h1>
+  <p class="hero-sub" id="heroSub"></p>
+
+  <!-- ANNOUNCER -->
+  <div class="announcer-wrap">
+    <div class="announcer-bar">
+      <div class="announcer-avatar-wrap">
+        <div class="announcer-avatar" id="announcerAvatar">&#127908;</div>
+      </div>
+      <div>
+        <div class="announcer-label" id="announcerName">Your Announcer</div>
+        <div class="announcer-text" id="announcerText"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav-row">
+    <a href="brackets.html" class="nav-btn primary">View Brackets</a>
+    <button class="nav-btn secondary" onclick="openEventSettings()">Event Settings</button>
+    <button class="nav-btn teal" onclick="toggleEditMode()">Edit Teams</button>
+  </div>
+</div>
+
+<!-- TEAMS SECTION -->
+<div class="section">
+  <div class="section-divider"></div>
+  <div id="editBar" class="edit-bar" style="display:none">
+    <p>Edit mode — click any team card to edit, or add a new team below</p>
+    <button class="btn-edit-mode" onclick="toggleEditMode()">Done</button>
+  </div>
+  <div class="section-header">
+    <div class="section-title">The <span class="hl">Teams</span></div>
+  </div>
+  <div class="teams-grid" id="teamsGrid"></div>
+</div>
+
+<!-- GAMES SECTION -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">The <span class="hl">Games</span></div>
+    <a href="brackets.html" class="nav-btn secondary" style="font-size:12px;padding:.35rem .9rem">Brackets</a>
+  </div>
+  <div class="games-row" id="gamesRow"></div>
+  <p style="font-size:12px;color:var(--muted)">Add games under <strong style="color:var(--text)">Event Settings</strong> above.</p>
+</div>
+
+<div class="footer">
+  Beer Olympics &mdash; <a href="https://pages.github.com" target="_blank">Host free on GitHub Pages</a>
+</div>
+
+<!-- TEAM MODAL -->
+<div class="modal-backdrop hidden" id="teamModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modalTitle">Add Team</h2>
+      <button class="modal-close" onclick="closeTeamModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Team Name</label>
+        <input class="form-input" id="teamNameInput" placeholder="Enter a team name" maxlength="30">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Team Icon</label>
+        <div class="emoji-picker" id="emojiPicker"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Team Color</label>
+        <div class="color-row" id="colorPicker"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Hype Level</label>
+        <div class="range-wrap">
+          <input type="range" class="form-input" id="hypeInput" min="0" max="100" value="50">
+          <span class="range-val" id="hypeVal">50</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Battle Cry</label>
+        <input class="form-input" id="cryInput" placeholder="Team motto or battle cry" maxlength="60">
+      </div>
+      <button class="btn-save" onclick="saveTeam()">Save Team</button>
+      <button class="btn-danger" id="deleteTeamBtn" style="display:none" onclick="deleteTeam()">Remove Team</button>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT SETTINGS MODAL -->
+<div class="modal-backdrop hidden" id="eventModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Event Settings</h2>
+      <button class="modal-close" onclick="closeEventSettings()">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Event Name</label>
+        <input class="form-input" id="eventNameInput" placeholder="e.g. Beer Olympics 2025">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Subtitle</label>
+        <input class="form-input" id="subtitleInput" placeholder="A short tagline for the event">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Announcer Name</label>
+        <input class="form-input" id="announcerNameInput" placeholder="e.g. Kommentator Karl">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Announcer Quote</label>
+        <textarea class="form-input" id="announcerInput" rows="3" placeholder="Opening words from your announcer..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Games (one per line)</label>
+        <textarea class="form-input" id="gamesInput" rows="6" placeholder="Beer Pong&#10;Flip Cup&#10;Cornhole&#10;Dizzy Bat"></textarea>
+      </div>
+      <button class="btn-save" onclick="saveEventSettings()">Save Settings</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLORS = ['#ff3c6e','#ff8c42','#ffd84d','#39ff9a','#00d4ff','#4d8fff','#c042ff','#ff42c8','#ffffff'];
+const EMOJIS = ['&#x1F3C6;','&#x26A1;','&#x1F525;','&#x1F480;','&#x1F409;','&#x1F98A;','&#x1F985;','&#x1F99C;','&#x1F30A;','&#x1F300;','&#x1F47E;','&#x1F916;','&#x2694;','&#x1F94A;','&#x1F3AF;','&#x1F52E;','&#x1F31F;','&#x1FAB6;','&#x1F9A2;','&#x1F31A;'];
+
+let state = {
+  eventName: '',
+  subtitle: '',
+  announcerName: '',
+  announcer: '',
+  games: [],
+  teams: [],
+};
+let editMode = false;
+let editingTeamId = null;
+let selectedColor = COLORS[0];
+let selectedEmoji = EMOJIS[0];
+
+function load(){
+  const saved = localStorage.getItem('beerOlympicsState');
+  if(saved) try{ state = JSON.parse(saved); }catch(e){}
+  render();
+}
+function save(){
+  localStorage.setItem('beerOlympicsState', JSON.stringify(state));
+}
+
+function render(){
+  // Hero
+  const name = state.eventName||'Beer Olympics';
+  const parts = name.toUpperCase().split(' ');
+  document.getElementById('heroTitle').innerHTML =
+    `<span class="line1">${parts[0]||'BEER'}</span><br><span class="line2">${parts.slice(1).join(' ')||'OLYMPICS'}</span>`;
+  document.getElementById('heroSub').textContent = state.subtitle||'';
+  document.getElementById('announcerName').textContent = state.announcerName||'Your Announcer';
+  document.getElementById('announcerText').textContent = state.announcer||'';
+  renderTeams();
+  renderGames();
+  updateTicker();
+}
+
+function renderTeams(){
+  const grid = document.getElementById('teamsGrid');
+  grid.innerHTML = '';
+  state.teams.forEach(team=>{
+    const card = document.createElement(editMode?'div':'a');
+    card.className='team-card';
+    if(!editMode) card.href=`team.html?id=${team.id}`;
+    else card.onclick=()=>openTeamModal(team.id);
+    const glow = team.color+'33';
+    card.innerHTML=`
+      <div class="team-card-banner" style="background:linear-gradient(135deg,${glow},${team.color}22)">
+        <span style="position:relative;z-index:1;filter:drop-shadow(0 0 12px ${team.color})">${team.emoji||'?'}</span>
+      </div>
+      <div class="team-card-body">
+        <div class="team-card-name" style="color:${team.color}">${team.name}</div>
+        <div class="team-card-cry">${team.cry||''}</div>
+        <div class="team-wins"><b>${team.wins||0}</b> wins</div>
+        <div class="hype-bar"><div class="hype-fill" style="width:${team.hype||0}%;background:${team.color}"></div></div>
+        ${editMode?'<div class="card-edit-hint">Click to edit</div>':''}
+      </div>`;
+    grid.appendChild(card);
+  });
+  if(editMode){
+    const add=document.createElement('div');
+    add.className='add-team-card';
+    add.onclick=()=>openTeamModal(null);
+    add.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Add Team</span>`;
+    grid.appendChild(add);
+  }
+}
+
+function renderGames(){
+  const row=document.getElementById('gamesRow');
+  if(!state.games.length){
+    row.innerHTML='<div class="games-empty">No games added yet.</div>';
+    return;
+  }
+  row.innerHTML=state.games.map(g=>`<div class="game-chip">${g}</div>`).join('');
+}
+
+function updateTicker(){
+  const names = state.teams.length
+    ? state.teams.map(t=>t.name).join(' &mdash; ')
+    : 'No teams yet';
+  const event = state.eventName||'Beer Olympics';
+  const seg = `<span>${event.toUpperCase()}</span><span class="sep">&mdash;</span><span>${names}</span><span class="sep">&mdash;</span>`;
+  document.getElementById('tickerTrack').innerHTML = seg+seg;
+}
+
+function toggleEditMode(){
+  editMode=!editMode;
+  document.getElementById('editBar').style.display=editMode?'flex':'none';
+  renderTeams();
+}
+
+// TEAM MODAL
+function openTeamModal(id){
+  editingTeamId=id;
+  const team=id?state.teams.find(t=>t.id===id):null;
+  document.getElementById('modalTitle').textContent=team?'Edit Team':'Add Team';
+  document.getElementById('teamNameInput').value=team?.name||'';
+  document.getElementById('hypeInput').value=team?.hype??50;
+  document.getElementById('hypeVal').textContent=team?.hype??50;
+  document.getElementById('cryInput').value=team?.cry||'';
+  document.getElementById('deleteTeamBtn').style.display=team?'block':'none';
+  selectedColor=team?.color||COLORS[0];
+  selectedEmoji=team?.emoji||EMOJIS[0];
+  buildColorPicker();
+  buildEmojiPicker();
+  document.getElementById('teamModal').classList.remove('hidden');
+}
+function closeTeamModal(){document.getElementById('teamModal').classList.add('hidden')}
+function buildColorPicker(){
+  document.getElementById('colorPicker').innerHTML=COLORS.map(c=>`<div class="color-swatch${c===selectedColor?' active':''}" style="background:${c}" onclick="pickColor('${c}')"></div>`).join('');
+}
+function buildEmojiPicker(){
+  document.getElementById('emojiPicker').innerHTML=EMOJIS.map(e=>`<div class="emoji-opt${e===selectedEmoji?' active':''}" onclick="pickEmoji('${e}')">${e}</div>`).join('');
+}
+function pickColor(c){selectedColor=c;buildColorPicker()}
+function pickEmoji(e){selectedEmoji=e;buildEmojiPicker()}
+document.getElementById('hypeInput').addEventListener('input',e=>document.getElementById('hypeVal').textContent=e.target.value);
+
+function saveTeam(){
+  const name=document.getElementById('teamNameInput').value.trim();
+  if(!name){alert('Give your team a name!');return}
+  if(editingTeamId){
+    const t=state.teams.find(t=>t.id===editingTeamId);
+    t.name=name;t.emoji=selectedEmoji;t.color=selectedColor;
+    t.hype=+document.getElementById('hypeInput').value;
+    t.cry=document.getElementById('cryInput').value.trim();
+  }else{
+    state.teams.push({id:'t'+Date.now(),name,emoji:selectedEmoji,color:selectedColor,
+      hype:+document.getElementById('hypeInput').value,
+      cry:document.getElementById('cryInput').value.trim(),wins:0,losses:0});
+  }
+  save();render();closeTeamModal();burst();
+}
+function deleteTeam(){
+  if(!confirm('Remove this team?'))return;
+  state.teams=state.teams.filter(t=>t.id!==editingTeamId);
+  save();render();closeTeamModal();
+}
+
+// EVENT SETTINGS
+function openEventSettings(){
+  document.getElementById('eventNameInput').value=state.eventName||'';
+  document.getElementById('subtitleInput').value=state.subtitle||'';
+  document.getElementById('announcerNameInput').value=state.announcerName||'';
+  document.getElementById('announcerInput').value=state.announcer||'';
+  document.getElementById('gamesInput').value=state.games.join('\n');
+  document.getElementById('eventModal').classList.remove('hidden');
+}
+function closeEventSettings(){document.getElementById('eventModal').classList.add('hidden')}
+function saveEventSettings(){
+  state.eventName=document.getElementById('eventNameInput').value.trim();
+  state.subtitle=document.getElementById('subtitleInput').value.trim();
+  state.announcerName=document.getElementById('announcerNameInput').value.trim();
+  state.announcer=document.getElementById('announcerInput').value.trim();
+  state.games=document.getElementById('gamesInput').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  save();render();closeEventSettings();burst();
+}
+
+// CONFETTI
+function burst(){
+  const colors=['#ffd84d','#ff3c6e','#39ff9a','#00d4ff','#c042ff'];
+  for(let i=0;i<50;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    el.style.cssText=`left:${Math.random()*100}vw;top:0;background:${colors[Math.random()*colors.length|0]};
+      width:${5+Math.random()*8}px;height:${5+Math.random()*8}px;
+      border-radius:${Math.random()>.5?'50%':'2px'};
+      animation-duration:${1.5+Math.random()*1.5}s;animation-delay:${Math.random()*.4}s`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),3500);
+  }
+}
+
+// STARFIELD
+function buildStars(){
+  const sf=document.getElementById('starfield');
+  for(let i=0;i<160;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const size=Math.random()<.85?.5+Math.random():1.5+Math.random();
+    s.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;
+      animation-duration:${2+Math.random()*5}s;animation-delay:${Math.random()*5}s`;
+    sf.appendChild(s);
+  }
+}
+
+document.getElementById('teamModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeTeamModal()});
+document.getElementById('eventModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeEventSettings()});
+
+buildStars();
+load();
+</script>
+</body>
+</html>

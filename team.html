@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Page</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,400;0,500;0,700;0,900;1,400&family=Rubik+Mono+One&family=Rubik+Dirt&family=Rubik+Wet+Paint&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#04040e;--surface:#0c0c1a;--surface2:#131325;
+  --text:#e8e8ff;--muted:#5a5a80;
+  --team-color:#ffd84d;
+}
+body{background:var(--bg);color:var(--text);font-family:'Rubik',sans-serif;overflow-x:hidden;min-height:100vh}
+
+/* STARFIELD */
+#starfield{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.star{position:absolute;border-radius:50%;background:#fff;animation:twinkle linear infinite}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.9}}
+
+/* TICKER */
+.ticker-wrap{position:relative;z-index:10;background:rgba(4,4,14,.9);border-bottom:1px solid rgba(255,255,255,.08);overflow:hidden;height:34px;display:flex;align-items:center;backdrop-filter:blur(8px)}
+.ticker-track{display:flex;animation:ticker 35s linear infinite;white-space:nowrap;gap:80px;font-size:12px;font-weight:600;color:var(--team-color);letter-spacing:.8px;text-transform:uppercase}
+.ticker-track .sep{color:var(--muted);margin:0 12px}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* BACK NAV */
+.back-nav{position:relative;z-index:1;display:inline-flex;align-items:center;gap:.4rem;padding:1rem 1.5rem;font-weight:600;font-size:13px;color:var(--muted);text-decoration:none;transition:color .2s;letter-spacing:.3px;text-transform:uppercase}
+.back-nav:hover{color:var(--text)}
+
+/* HERO */
+.team-hero{min-height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:2.5rem 1rem 2rem;text-align:center}
+.hero-glow{position:absolute;width:500px;height:500px;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);filter:blur(90px);opacity:.18;pointer-events:none}
+.hero-rings{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.hero-ring{position:absolute;border-radius:50%;border:1px solid var(--team-color);animation:ringPulse 3.5s ease-in-out infinite;opacity:.1}
+@keyframes ringPulse{0%,100%{transform:scale(1);opacity:.08}50%{transform:scale(1.04);opacity:.18}}
+.hero-emoji{font-size:80px;margin-bottom:1rem;animation:pulse 2.5s ease-in-out infinite;position:relative;z-index:1;filter:drop-shadow(0 0 20px var(--team-color))}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+.team-name{font-family:'Rubik Wet Paint',cursive;font-size:clamp(2.5rem,8vw,5.5rem);line-height:.95;color:var(--team-color);position:relative;z-index:1;filter:drop-shadow(0 0 20px rgba(var(--team-color),.3))}
+.team-cry{font-style:italic;color:rgba(255,255,255,.5);font-size:1rem;margin-top:.75rem;position:relative;z-index:1}
+
+/* CONTENT */
+.page-content{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:0 1.5rem 3rem}
+
+/* ANNOUNCER */
+.announcer-bar{background:rgba(13,13,37,.8);border:1.5px solid var(--team-color);border-radius:16px;padding:1rem 1.5rem;display:flex;align-items:flex-start;gap:1.25rem;margin:1.5rem 0;backdrop-filter:blur(12px);box-shadow:0 0 30px rgba(255,216,77,.06)}
+.announcer-avatar{font-size:36px;animation:bob 2.5s ease-in-out infinite;flex-shrink:0}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-5px) rotate(2deg)}}
+.announcer-label{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--team-color);font-weight:700;margin-bottom:4px}
+.announcer-text{font-size:14px;color:var(--text);line-height:1.6;font-style:italic}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:1rem;margin:1.5rem 0}
+.stat-card{background:var(--surface);border-radius:16px;padding:1.25rem;text-align:center;border:1px solid rgba(255,255,255,.05)}
+.stat-val{font-family:'Rubik Mono One',monospace;font-size:2.2rem;color:var(--team-color);line-height:1}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-top:.4rem}
+
+/* HYPE */
+.hype-section{background:var(--surface);border-radius:14px;padding:1.25rem 1.5rem;margin:1rem 0;border:1px solid rgba(255,255,255,.05)}
+.block-title{font-family:'Rubik Mono One',monospace;font-size:.85rem;color:var(--muted);margin-bottom:.75rem;text-transform:uppercase;letter-spacing:1.5px}
+.hype-bar-big{height:12px;background:rgba(255,255,255,.07);border-radius:6px;overflow:hidden;margin-bottom:.5rem}
+.hype-fill-big{height:100%;border-radius:6px;transition:width 1.2s cubic-bezier(.25,.46,.45,.94);position:relative;overflow:hidden}
+.hype-fill-big::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);animation:shimmer 2s infinite}
+@keyframes shimmer{0%{left:-100%}100%{left:200%}}
+.hype-pct{font-size:13px;color:var(--muted);margin-top:.35rem}
+
+/* BLOCKS */
+.section-block{background:var(--surface);border-radius:14px;padding:1.25rem 1.5rem;margin-top:1.25rem;border:1px solid rgba(255,255,255,.05)}
+
+/* GAMES TABLE */
+.games-table{width:100%;border-collapse:collapse;margin-top:.5rem}
+.games-table th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);padding:.5rem .75rem;border-bottom:1px solid rgba(255,255,255,.06);font-weight:600}
+.games-table td{padding:.7rem .75rem;font-size:13px;border-bottom:1px solid rgba(255,255,255,.03)}
+.games-table tr:last-child td{border-bottom:none}
+.games-table tr:hover td{background:rgba(255,255,255,.02)}
+.badge{display:inline-block;padding:.2rem .65rem;border-radius:50px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.badge-w{background:rgba(57,255,154,.12);color:#39ff9a}
+.badge-l{background:rgba(255,60,110,.12);color:#ff3c6e}
+.badge-p{background:rgba(255,255,255,.07);color:var(--muted)}
+.win-ctrl{display:flex;gap:.35rem;align-items:center}
+.win-btn{background:none;border:1px solid rgba(255,255,255,.12);border-radius:6px;color:var(--text);width:26px;height:26px;cursor:pointer;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:'Rubik',sans-serif}
+.win-btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.3)}
+.btn-w:hover{border-color:#39ff9a;color:#39ff9a}
+.btn-l:hover{border-color:#ff3c6e;color:#ff3c6e}
+
+/* ROSTER */
+.member-grid{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:.75rem}
+.member-card{background:var(--surface2);border-radius:14px;padding:.75rem 1rem;display:flex;flex-direction:column;align-items:center;gap:.35rem;min-width:88px;border:1px solid rgba(255,255,255,.05);cursor:pointer;transition:border-color .2s}
+.member-card:hover{border-color:var(--team-color)}
+.member-avatar{font-size:30px}
+.member-name{font-size:12px;font-weight:700;color:var(--text);text-align:center}
+.member-title{font-size:11px;color:var(--muted);text-align:center}
+.add-member-btn{background:transparent;border:1.5px dashed rgba(255,255,255,.12);border-radius:14px;padding:.75rem 1rem;min-width:88px;color:var(--muted);cursor:pointer;font-family:'Rubik',sans-serif;font-size:12px;font-weight:700;transition:all .2s;text-transform:uppercase;letter-spacing:.5px}
+.add-member-btn:hover{border-color:var(--team-color);color:var(--team-color)}
+
+/* MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(6px)}
+.modal-backdrop.hidden{display:none}
+.modal{background:var(--surface);border-radius:22px;max-width:400px;width:100%;border:1px solid rgba(255,255,255,.08)}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:1.25rem 1.5rem;border-bottom:1px solid rgba(255,255,255,.06)}
+.modal-header h2{font-family:'Rubik Mono One',monospace;font-size:.95rem;color:var(--team-color)}
+.modal-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:2px 6px;border-radius:6px}
+.modal-close:hover{color:var(--text);background:rgba(255,255,255,.08)}
+.modal-body{padding:1.5rem;display:flex;flex-direction:column;gap:1rem}
+.form-group{display:flex;flex-direction:column;gap:.4rem}
+.form-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:700}
+.form-input{background:var(--bg);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:'Rubik',sans-serif;font-size:15px;outline:none;width:100%;transition:border-color .2s}
+.form-input:focus{border-color:var(--team-color)}
+.emoji-picker{display:flex;flex-wrap:wrap;gap:.4rem}
+.emoji-opt{font-size:22px;cursor:pointer;padding:.3rem;border-radius:8px;transition:all .15s;border:2px solid transparent}
+.emoji-opt:hover,.emoji-opt.active{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);transform:scale(1.15)}
+.btn-save{width:100%;background:linear-gradient(135deg,var(--team-color),#ff42c8);color:#000;border:none;border-radius:50px;padding:.85rem;font-family:'Rubik',sans-serif;font-weight:700;font-size:15px;cursor:pointer;transition:all .2s}
+.btn-save:hover{transform:translateY(-1px);filter:brightness(1.1)}
+.btn-danger{width:100%;background:transparent;color:#ff5555;border:1px solid rgba(255,85,85,.4);border-radius:50px;padding:.7rem;font-family:'Rubik',sans-serif;font-weight:600;font-size:13px;cursor:pointer;margin-top:.15rem}
+.btn-danger:hover{background:rgba(255,85,85,.08)}
+
+/* CONFETTI */
+.confetti-piece{position:fixed;pointer-events:none;z-index:999;animation:confettiFall 2.5s ease-in forwards}
+@keyframes confettiFall{0%{opacity:1;transform:translateY(-10px) rotate(0deg)}100%{opacity:0;transform:translateY(100vh) rotate(900deg)}}
+
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 4px);pointer-events:none;z-index:5}
+</style>
+</head>
+<body>
+
+<div id="starfield"></div>
+
+<div class="ticker-wrap"><div class="ticker-track" id="ticker">Loading...</div></div>
+
+<a class="back-nav" href="index.html">&#8592; All Teams</a>
+
+<div class="team-hero" id="teamHero">
+  <div class="hero-glow" id="heroGlow"></div>
+  <div class="hero-rings">
+    <div class="hero-ring" style="width:350px;height:350px"></div>
+    <div class="hero-ring" style="width:550px;height:550px;animation-delay:.8s;opacity:.06"></div>
+  </div>
+  <div class="hero-emoji" id="teamEmoji"></div>
+  <h1 class="team-name" id="teamNameEl">Loading...</h1>
+  <p class="team-cry" id="teamCry"></p>
+</div>
+
+<div class="page-content">
+  <!-- ANNOUNCER -->
+  <div class="announcer-bar">
+    <div class="announcer-avatar">&#127908;</div>
+    <div>
+      <div class="announcer-label" id="announcerLabel">Announcer</div>
+      <div class="announcer-text" id="announcerQuote"></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-val" id="statWins">0</div><div class="stat-label">Wins</div></div>
+    <div class="stat-card"><div class="stat-val" id="statLosses">0</div><div class="stat-label">Losses</div></div>
+    <div class="stat-card"><div class="stat-val" id="statHype">--</div><div class="stat-label">Hype</div></div>
+  </div>
+
+  <!-- HYPE METER -->
+  <div class="hype-section">
+    <div class="block-title">Hype Meter</div>
+    <div class="hype-bar-big"><div class="hype-fill-big" id="hypeFill" style="width:0%"></div></div>
+    <div class="hype-pct" id="hypeText">--</div>
+  </div>
+
+  <!-- GAME RESULTS -->
+  <div class="section-block">
+    <div class="block-title">Game Results</div>
+    <table class="games-table">
+      <thead><tr><th>Game</th><th>Result</th><th>Set</th></tr></thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+  </div>
+
+  <!-- ROSTER -->
+  <div class="section-block">
+    <div class="block-title">Roster</div>
+    <div class="member-grid" id="memberGrid"></div>
+    <div style="margin-top:1rem">
+      <button class="add-member-btn" onclick="openMemberModal(null)">+ Add Player</button>
+    </div>
+  </div>
+</div>
+
+<!-- MEMBER MODAL -->
+<div class="modal-backdrop hidden" id="memberModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="memberModalTitle">Add Player</h2>
+      <button class="modal-close" onclick="closeMemberModal()">&#x2715;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Name</label>
+        <input class="form-input" id="memberNameInput" placeholder="Player name" maxlength="24">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Role or Title</label>
+        <input class="form-input" id="memberTitleInput" placeholder="e.g. Captain" maxlength="24">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Avatar</label>
+        <div class="emoji-picker" id="memberEmojiPicker"></div>
+      </div>
+      <button class="btn-save" onclick="saveMember()">Save Player</button>
+      <button class="btn-danger" id="deleteMemberBtn" style="display:none" onclick="deleteMember()">Remove Player</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const MEMBER_EMOJIS = ['&#x1F60E;','&#x1F920;','&#x1F610;','&#x1F9D0;','&#x1F92A;','&#x1F608;','&#x1F47F;','&#x1F916;','&#x1F9D9;','&#x1F977;','&#x1F9B8;','&#x1F47E;','&#x1F9A7;','&#x1F98D;','&#x1F432;','&#x1F3AD;','&#x1F451;','&#x1FA96;','&#x1F9A1;','&#x1F985;'];
+
+const TEAM_QUIPS = [
+  t=>`${t.name} — hype is at ${t.hype}%. The crowd feels it.`,
+  t=>`Eyes on ${t.name}. They didn't come here to lose.`,
+  t=>`${t.name} has entered the arena. ${t.cry ? '"' + t.cry + '"' : 'No battle cry needed — the results speak.'}`,
+  t=>`${t.name}. ${t.wins||0} wins deep and not done yet.`,
+  t=>`Don't sleep on ${t.name}. That's all I'll say.`,
+];
+
+let state={};
+let teamId=null;
+let teamData=null;
+let editingMemberId=null;
+let selectedMemberEmoji=MEMBER_EMOJIS[0];
+
+function load(){
+  const params=new URLSearchParams(window.location.search);
+  teamId=params.get('id');
+  const saved=localStorage.getItem('beerOlympicsState');
+  if(saved)try{state=JSON.parse(saved)}catch(e){}
+  if(!state.teams)state.teams=[];
+  teamData=state.teams.find(t=>t.id===teamId);
+  if(!teamData){
+    document.body.innerHTML='<div style="padding:3rem;text-align:center;color:#5a5a80;font-family:Rubik,sans-serif">Team not found. <a href="index.html" style="color:#ffd84d">&#8592; Back</a></div>';
+    return;
+  }
+  if(!teamData.members)teamData.members=[];
+  if(!teamData.results)teamData.results={};
+  document.title=teamData.name+' — Beer Olympics';
+  render();
+}
+function save(){localStorage.setItem('beerOlympicsState',JSON.stringify(state))}
+
+function render(){
+  document.documentElement.style.setProperty('--team-color',teamData.color||'#ffd84d');
+
+  // Hero
+  document.getElementById('heroGlow').style.background=teamData.color||'#ffd84d';
+  document.getElementById('teamEmoji').textContent=teamData.emoji||'';
+  document.getElementById('teamNameEl').textContent=teamData.name;
+  document.getElementById('teamCry').textContent=teamData.cry?'"'+teamData.cry+'"':'';
+
+  // Ticker
+  const tickBase=`<span>${teamData.name.toUpperCase()}</span><span class="sep">—</span><span>HYPE: ${teamData.hype||0}%</span><span class="sep">—</span><span>WINS: ${teamData.wins||0}</span><span class="sep">—</span>`;
+  document.getElementById('ticker').innerHTML=tickBase+tickBase;
+
+  // Announcer
+  const announcerName=state.announcerName||'Announcer';
+  document.getElementById('announcerLabel').textContent=announcerName;
+  const quip=TEAM_QUIPS[Math.floor(Math.random()*TEAM_QUIPS.length)](teamData);
+  document.getElementById('announcerQuote').textContent=quip;
+
+  // Stats
+  const wins=teamData.wins||0;
+  const losses=teamData.losses||0;
+  document.getElementById('statWins').textContent=wins;
+  document.getElementById('statLosses').textContent=losses;
+  document.getElementById('statHype').textContent=(teamData.hype||0)+'%';
+
+  // Hype bar
+  const hype=teamData.hype||0;
+  document.getElementById('hypeFill').style.width=hype+'%';
+  document.getElementById('hypeFill').style.background=teamData.color||'#ffd84d';
+  const level=hype>=80?'Peak Energy':hype>=60?'Locked In':hype>=40?'Warming Up':'Getting There';
+  document.getElementById('hypeText').textContent=`${hype}% — ${level}`;
+
+  renderResults();
+  renderRoster();
+}
+
+function renderResults(){
+  const games=state.games||[];
+  const body=document.getElementById('resultsBody');
+  body.innerHTML='';
+  if(!games.length){
+    body.innerHTML='<tr><td colspan="3" style="color:var(--muted);font-size:12px;text-align:center;padding:1rem">No games yet. Add games in Event Settings on the main page.</td></tr>';
+    return;
+  }
+  games.forEach(g=>{
+    const result=teamData.results[g]||'pending';
+    const tr=document.createElement('tr');
+    const badge=result==='win'?'<span class="badge badge-w">Win</span>':result==='loss'?'<span class="badge badge-l">Loss</span>':'<span class="badge badge-p">Pending</span>';
+    tr.innerHTML=`<td>${g}</td><td>${badge}</td>
+      <td><div class="win-ctrl">
+        <button class="win-btn btn-w" onclick="setResult('${g}','win')">W</button>
+        <button class="win-btn btn-l" onclick="setResult('${g}','loss')">L</button>
+        <button class="win-btn" onclick="setResult('${g}','pending')">—</button>
+      </div></td>`;
+    body.appendChild(tr);
+  });
+}
+function setResult(game,result){
+  teamData.results[game]=result;
+  const wins=Object.values(teamData.results).filter(r=>r==='win').length;
+  const losses=Object.values(teamData.results).filter(r=>r==='loss').length;
+  teamData.wins=wins;teamData.losses=losses;
+  save();
+  document.getElementById('statWins').textContent=wins;
+  document.getElementById('statLosses').textContent=losses;
+  if(result==='win')burst();
+  renderResults();
+}
+
+function renderRoster(){
+  const grid=document.getElementById('memberGrid');
+  grid.innerHTML='';
+  (teamData.members||[]).forEach(m=>{
+    const div=document.createElement('div');
+    div.className='member-card';
+    div.innerHTML=`<div class="member-avatar">${m.emoji||'?'}</div><div class="member-name">${m.name}</div><div class="member-title">${m.title||''}</div>`;
+    div.onclick=()=>openMemberModal(m.id);
+    grid.appendChild(div);
+  });
+}
+
+function openMemberModal(id){
+  editingMemberId=id;
+  const m=id?teamData.members.find(m=>m.id===id):null;
+  document.getElementById('memberModalTitle').textContent=m?'Edit Player':'Add Player';
+  document.getElementById('memberNameInput').value=m?.name||'';
+  document.getElementById('memberTitleInput').value=m?.title||'';
+  document.getElementById('deleteMemberBtn').style.display=m?'block':'none';
+  selectedMemberEmoji=m?.emoji||MEMBER_EMOJIS[0];
+  buildMemberEmojiPicker();
+  document.getElementById('memberModal').classList.remove('hidden');
+}
+function closeMemberModal(){document.getElementById('memberModal').classList.add('hidden')}
+function buildMemberEmojiPicker(){
+  document.getElementById('memberEmojiPicker').innerHTML=MEMBER_EMOJIS.map(e=>`<div class="emoji-opt${e===selectedMemberEmoji?' active':''}" onclick="pickMemberEmoji('${e}')">${e}</div>`).join('');
+}
+function pickMemberEmoji(e){selectedMemberEmoji=e;buildMemberEmojiPicker()}
+function saveMember(){
+  const name=document.getElementById('memberNameInput').value.trim();
+  if(!name){alert('Give the player a name!');return}
+  if(editingMemberId){
+    const m=teamData.members.find(m=>m.id===editingMemberId);
+    m.name=name;m.title=document.getElementById('memberTitleInput').value.trim();m.emoji=selectedMemberEmoji;
+  }else{
+    teamData.members.push({id:'m'+Date.now(),name,title:document.getElementById('memberTitleInput').value.trim(),emoji:selectedMemberEmoji});
+  }
+  save();render();closeMemberModal();burst();
+}
+function deleteMember(){
+  teamData.members=teamData.members.filter(m=>m.id!==editingMemberId);
+  save();render();closeMemberModal();
+}
+
+function burst(){
+  const c=teamData.color||'#ffd84d';
+  const colors=[c,'#ffffff','#ffd84d'];
+  for(let i=0;i<35;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    el.style.cssText=`left:${Math.random()*100}vw;top:0;background:${colors[Math.random()*colors.length|0]};
+      width:${5+Math.random()*7}px;height:${5+Math.random()*7}px;
+      border-radius:${Math.random()>.5?'50%':'2px'};
+      animation-duration:${1.5+Math.random()*1.5}s;animation-delay:${Math.random()*.4}s`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),3500);
+  }
+}
+
+function buildStars(){
+  const sf=document.getElementById('starfield');
+  for(let i=0;i<140;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const sz=Math.random()<.85?.5+Math.random():1.5+Math.random();
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;
+      animation-duration:${2+Math.random()*5}s;animation-delay:${Math.random()*5}s`;
+    sf.appendChild(s);
+  }
+}
+
+document.getElementById('memberModal').addEventListener('click',e=>{if(e.target===e.currentTarget)closeMemberModal()});
+
+buildStars();
+load();
+</script>
+</body>
+</html>
+Done
+
+You are out of free messages until 3:00 PM
